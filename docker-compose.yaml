@@ -1,0 +1,47 @@
+networks:
+  black-matter:
+    driver: bridge
+
+services:
+  spaceship:
+    build:
+      context: ./code/frontend/issng
+      dockerfile: local.Dockerfile
+    networks:
+      - black-matter
+    ports:
+      - "7660:443"
+    volumes:
+      - ./development_cert.pem:/etc/nginx/certs/server.crt:ro
+      - ./development_cert.key:/etc/nginx/certs/server.key:ro
+    restart: always
+  earthapi:
+    build:
+      context: ./code/backend
+      dockerfile: EarthAPI/Dockerfile
+    networks:
+      - black-matter
+    ports:
+      - "7662:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ./development_cert.pfx:/https/aspnetapp.pfx:ro
+  sunapi:
+    build:
+      context: ./code/backend
+      dockerfile: SunAPI/Dockerfile
+    networks:
+      - black-matter    
+    ports:
+      - "7661:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ./development_cert.pfx:/https/aspnetapp.pfx:ro

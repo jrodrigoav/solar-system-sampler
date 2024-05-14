@@ -8,3 +8,4 @@ package-lock.json
 .env*
 development_cert.key
 development_cert.pem
+development_cert.pfx
